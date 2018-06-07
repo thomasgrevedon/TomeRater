@@ -18,3 +18,9 @@ class User(object):
 
     def __eq__(self, other_user):
         pass
+
+user1 = User("Stephen Hawking", "hawking@universe.edu")
+print(user1)
+user1.change_email("ouiouioui")
+user1.books = {"lala": "ok", "lol": "not ok"}
+print(user1)
