@@ -4,7 +4,6 @@ class User(object):
         self.email = email #this will be a string
         self.books = {} #this will map a book object
 
-
     def get_email(self):
         return self.email
 
@@ -19,6 +18,19 @@ class User(object):
     def __eq__(self, other_user):
         if other_user.name == self.name:
             return other_user.email == self.email
+
+    def read_book(self, book, rating = "None"):
+        self.books[book] = rating
+
+    def get_average_rating(self):
+        total = 0
+        for i in self.books.values():
+            total += i
+        if len(self.books.values()) > 0:
+            average = total / len(self.books.values())
+            return average
+
+
 
 class Book(object):
     def __init__(self, title, isbn):
@@ -74,5 +86,8 @@ class Non_Fiction(Book):
         return "{title}, a {level} manual on {subject}".format(title = self.title, level = self.level, subject = self.subject)
 
 
-Non_fiction1 = Non_Fiction("Korean learning", "Korean", "bebginner", 234543)
-print(Non_fiction1)
+user1 = User("Thomas", "thomas.grevedon@gmail.com")
+user1.read_book("le meilleur des mondes", 4)
+user1.read_book("le meilleur des jours", 3)
+print(user1.books)
+print(user1.get_average_rating())
