@@ -96,12 +96,42 @@ class Non_Fiction(Book):
     def __repr__(self):
         return "{title}, a {level} manual on {subject}".format(title = self.title, level = self.level, subject = self.subject)
 
-user1 = User("Thomas", "thomas.grevedon@gmail.com")
-book1 = Book("le meilleur des mondes", 23444)
-book2 = Book("le pire des monde", 2545)
-book1.add_rating(4)
-book2.add_rating(2)
-user1.read_book(book1, 4)
-user1.read_book(book2, 2)
-print(user1.get_average_rating())
-print(user1.books)
+class TomeRater(object):
+    def __init__(self):
+        self.users = {} #this will map a user's email to the cooresponding User obeject
+        self.books = {} #this will map a Book object to the number of Users that have read it
+
+    def create_book(self, title, isbn):
+        return Book(title, isbn)
+
+    def create_novel(self, title, author, isbn):
+        return Fiction(title, author, isbn)
+
+    def create_non_fiction(self, title, subject, level, isbn):
+        return Non_Fiction(title, subject, level, isbn)
+
+    def add_book_to_user(self, book, email, rating = "None"):
+        try:
+            self.users[email]
+            self.users[email].read_book(book, rating)
+            if rating != "None":
+                book.add_rating(rating)
+            try:
+                self.books[book]
+                self.books[book] += 1
+            except KeyError:
+                self.books[book] = 1
+        except KeyError:
+            print("No user with email {email}".format(email = email))
+
+    def add_user(self, name, email, books = "None"):
+        self.users[email] = User(name, email) #should I ass self?
+        if books != "None":
+            for i in books:
+                self.add_book_to_user(i, email)
+
+
+Tome_Rater = TomeRater()
+Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", books = ["oui", "le meilleur du jeu"])
+print(Tome_Rater.users)
+print(Tome_Rater.books)
