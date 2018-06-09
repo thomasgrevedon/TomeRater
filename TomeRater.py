@@ -58,6 +58,21 @@ class Fiction(Book):
     def __repr__(self):
         return "{title} by {author}".format(title = self.title, author = self.author)
 
-fiction1 = Fiction("test", "Thomas", 12345)
-print(fiction1)
-print(fiction1.isbn)
+class Non_Fiction(Book):
+    def __init__(self, title, subject, level, isbn):
+        super().__init__(title, isbn)
+        self.subject = subject #this will be a string
+        self.level = level #this will be a string
+
+    def get_subject(self):
+        return self.subject
+
+    def get_level(self):
+        return self.level
+
+    def __repr__(self):
+        return "{title}, a {level} manual on {subject}".format(title = self.title, level = self.level, subject = self.subject)
+
+
+Non_fiction1 = Non_Fiction("Korean learning", "Korean", "bebginner", 234543)
+print(Non_fiction1)
