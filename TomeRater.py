@@ -58,6 +58,17 @@ class Book(object):
         if other_book.title == self.title:
             return other_book.isbn == self.isbn
 
+    def get_average_rating(self):
+        total = 0
+        for i in self.rating:
+            total += i
+        if len(self.rating) > 0:
+            average = total / len(self.rating)
+            return average
+
+    def __hash__(self):
+        return hash((self.title, self.isbn))
+
 
 class Fiction(Book):
     def __init__(self, title, author, isbn):
@@ -85,9 +96,12 @@ class Non_Fiction(Book):
     def __repr__(self):
         return "{title}, a {level} manual on {subject}".format(title = self.title, level = self.level, subject = self.subject)
 
-
 user1 = User("Thomas", "thomas.grevedon@gmail.com")
-user1.read_book("le meilleur des mondes", 4)
-user1.read_book("le meilleur des jours", 3)
-print(user1.books)
+book1 = Book("le meilleur des mondes", 23444)
+book2 = Book("le pire des monde", 2545)
+book1.add_rating(4)
+book2.add_rating(2)
+user1.read_book(book1, 4)
+user1.read_book(book2, 2)
 print(user1.get_average_rating())
+print(user1.books)
