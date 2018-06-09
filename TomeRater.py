@@ -17,4 +17,10 @@ class User(object):
         return "User {user}, email {email}, books read: {books_red}".format(user = self.name, email = self.email, books_red = number_of_books_red)
 
     def __eq__(self, other_user):
-        pass
+        return other_user.name == self.name
+        return other_user.email == self.email
+
+
+user1 = User("Thomas", "thomas.grevedon@gmail.com")
+user2 = User("Thoma", "thomas.grevedon@gmail.com")
+print(user1 == user2)
