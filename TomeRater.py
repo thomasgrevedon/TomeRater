@@ -46,13 +46,18 @@ class Book(object):
         if other_book.title == self.title:
             return other_book.isbn == self.isbn
 
-book1 = Book("aladin", 1234568)
-book2 = Book("aladin", 1234567)
-print(book1.title)
-print(book1.isbn)
-print(book1 == book2)
-book1.set_isbn(1234567)
-print(book1 == book2)
-book1.add_rating(5)
-book1.add_rating(3)
-print(book1.rating)
+
+class Fiction(Book):
+    def __init__(self, title, author, isbn):
+        super().__init__(title, isbn)
+        self.author = author
+
+    def get_author(self):
+        return self.author
+
+    def __repr__(self):
+        return "{title} by {author}".format(title = self.title, author = self.author)
+
+fiction1 = Fiction("test", "Thomas", 12345)
+print(fiction1)
+print(fiction1.isbn)
