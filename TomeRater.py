@@ -24,11 +24,15 @@ class User(object):
 
     def get_average_rating(self):
         total = 0
-        for i in self.books.values():
-            total += i
+        average = 0
+        for i in self.books:
+            if self.books[i] != "None":
+                total += self.books[i]
+            else:
+                continue
         if len(self.books.values()) > 0:
             average = total / len(self.books.values())
-            return average
+        return average
 
 
 
@@ -60,11 +64,12 @@ class Book(object):
 
     def get_average_rating(self):
         total = 0
+        average = 0
         for i in self.rating:
             total += i
         if len(self.rating) > 0:
             average = total / len(self.rating)
-            return average
+        return average
 
     def __hash__(self):
         return hash((self.title, self.isbn))
@@ -125,13 +130,67 @@ class TomeRater(object):
             print("No user with email {email}".format(email = email))
 
     def add_user(self, name, email, books = "None"):
-        self.users[email] = User(name, email) #should I ass self?
+        self.users[email] = User(name, email) #adds the email as Key in dictionnary of the class and add the User class as value
         if books != "None":
             for i in books:
                 self.add_book_to_user(i, email)
 
+    def print_catalog(self):
+        for i in self.books.keys():
+            print(i.title)
 
+    def print_users(self):
+        for i in self.users.values():
+            print(i)
+
+    def most_read_book(self):
+        total = 0
+        most_read_book = ""
+        for i in self.books:
+            if self.books[i] > total:
+                most_read_book = i.title
+                total = self.books[i]
+        return most_read_book
+
+    def highest_rated_book(self):
+        highest_average = 0
+        highest_rated_book = ""
+        for i in self.books:
+            average_rating = i.get_average_rating()
+            print(average_rating)
+            if average_rating > highest_average:
+                highest_average = average_rating
+                highest_rated_book = i.title
+        return highest_rated_book
+
+    def most_positive_user(self):
+        highest_average = 0
+        highest_positive_user = ""
+        for i in self.users.values():
+            average_rating = i.get_average_rating()
+            if average_rating > highest_average:
+                highest_average = average_rating
+                highest_positive_user = i
+        return highest_positive_user
+
+"""
 Tome_Rater = TomeRater()
-Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", books = ["oui", "le meilleur du jeu"])
-print(Tome_Rater.users)
+book1 = Tome_Rater.create_book("le meilleur des mondes", 3456)
+book2 = Tome_Rater.create_book("le meilleur du jeu", 32673838456)
+bookbook = Tome_Rater.create_book("bookbook", 345566)
+bookbookbof = Tome_Rater.create_book("bookbookbof", 348756)
+print(book1)
+Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", [book1])
+Tome_Rater.add_user("Thoma", "thomas.greveon@gmail.com", [book1])
+Tome_Rater.add_user("Tho", "thomas.@gmail.com", [book2])
 print(Tome_Rater.books)
+Tome_Rater.print_catalog()
+Tome_Rater.print_users()
+print(Tome_Rater.most_read_book())
+Tome_Rater.add_book_to_user(bookbook, "thomas.grevedon@gmail.com", 4)
+Tome_Rater.add_book_to_user(bookbook, "thomas.greveon@gmail.com", 2)
+Tome_Rater.add_book_to_user(bookbookbof, "thomas.grevedon@gmail.com", 2)
+Tome_Rater.add_book_to_user(bookbookbof, "thomas.@gmail.com", 2)
+print(Tome_Rater.highest_rated_book())
+print(Tome_Rater.most_positive_user())
+"""
