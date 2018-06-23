@@ -1,5 +1,3 @@
-import weakref
-
 class User(object):
     def __init__(self, name, email):
         self.name = name #this will be a string
@@ -39,23 +37,10 @@ class User(object):
 
 
 class Book(object):
-    instances = set()
-
     def __init__(self, title, isbn):
         self.title = title #this will be a string
         self.isbn = isbn #this will be a number
-        self.instances.add(weakref.ref(self))
         self.rating = []
-
-    def isIsbnExist(self, isbn):
-        if len(Book.instances) > 0:
-            isbn_list = []
-            for book in Book.instances:
-                book = book()
-                isbn_list.append(book.isbn)
-            return isbn in isbn_list
-        else:
-            return False
 
     def get_title(self):
         return self.title
@@ -74,7 +59,8 @@ class Book(object):
             print("invalid Rating")
 
     def __eq__(self, other_book):
-        return (other_book.title == self.title and other_book.isbn == self.isbn)
+        if other_book.title == self.title:
+            return other_book.isbn == self.isbn
 
     def get_average_rating(self):
         total = 0
@@ -116,33 +102,18 @@ class Non_Fiction(Book):
         return "{title}, a {level} manual on {subject}".format(title = self.title, level = self.level, subject = self.subject)
 
 class TomeRater(object):
-    MessageIsbnAlreadyExists = "Sorry, this ISBN already exists, please choose another ISBN for this book"
-    MessageUserAlreadyExists = "This user already exists. Please, choose add_book_to_user function in order to add book to this reader! Thanks mate"
-
     def __init__(self):
         self.users = {} #this will map a user's email to the cooresponding User obeject
         self.books = {} #this will map a Book object to the number of Users that have read it
 
     def create_book(self, title, isbn):
-        if Book.isIsbnExist(self, isbn) == False:
-            return Book(title, isbn)
-        else:
-            print(TomeRater.MessageIsbnAlreadyExists)
+        return Book(title, isbn)
 
     def create_novel(self, title, author, isbn):
-        print("ATTENTION ATTENTION")
-        if Book.isIsbnExist(self, isbn) == False:
-            print("ah ah je t'a eu")
-            print(Book.isIsbnExist(self, isbn))
-            return Fiction(title, author, isbn)
-        else:
-            print(TomeRater.MessageIsbnAlreadyExists)
+        return Fiction(title, author, isbn)
 
     def create_non_fiction(self, title, subject, level, isbn):
-        if Book.isIsbnExist(self, isbn) == False:
-            return Non_Fiction(title, subject, level, isbn)
-        else:
-            print(TomeRater.MessageIsbnAlreadyExists)
+        return Non_Fiction(title, subject, level, isbn)
 
     def add_book_to_user(self, book, email, rating = "None"):
         try:
@@ -159,33 +130,10 @@ class TomeRater(object):
             print("No user with email {email}".format(email = email))
 
     def add_user(self, name, email, user_books = "None"):
-        try:
-            self.users[email]
-            print(TomeRater.MessageUserAlreadyExists)
-        except KeyError:
-            checkList = ["@", ".edu", '.org', '.com', '.try']
-            sensor = 1
-            needMessage = True
-            while sensor < len(checkList):
-                if checkList[0] in email and checkList[sensor] in email:
-                    self.users[email] = User(name, email) #adds the email as Key in dictionnary of the class and add the User class as value
-                    if user_books != "None":
-                        for i in user_books:
-                            self.add_book_to_user(i, email)
-                    needMessage = False
-                    break
-                else:
-                    sensor += 1
-                    continue
-            if needMessage == True:
-                extension = ""
-                for i in checkList[1:]:
-                    extension += "\"" + i + "\" "
-                print("Please check the email address of user and make sure it has the following characheters: \"@\" and one of the following extension: " + extension)
-                #first test "\""
-                # for check in checklist message = please check that you have and the following email extension " " + "\"" check +  "\"" + ","
-                #print("Please check the email address of user and make sure it has the following characheters: \"@\" and \".edu\" \".com\" \".org\" ")
-
+        self.users[email] = User(name, email) #adds the email as Key in dictionnary of the class and add the User class as value
+        if user_books != "None":
+            for i in user_books:
+                self.add_book_to_user(i, email)
 
     def print_catalog(self):
         for i in self.books.keys():
@@ -224,29 +172,16 @@ class TomeRater(object):
                 highest_positive_user = i
         return highest_positive_user
 
-
+"""
 Tome_Rater = TomeRater()
-Tome_Rater.print_catalog()
 book1 = Tome_Rater.create_book("le meilleur des mondes", 3456)
-book3 = Tome_Rater.create_book("le meilleur des sites", 34567)
-book4 = Tome_Rater.create_book("le meilleur des test", 34567)
-book5 = Tome_Rater.create_book("le meilleur des sites", 345671)
-book6 = Tome_Rater.create_novel("le meilleur des novel", "Bernard De la Villardiere", 3456)
-book7 = Tome_Rater.create_non_fiction("le meilleur des website", "Python", "Beginner", 3456)
-book8 = Tome_Rater.create_novel("le meilleur des website", "Python", 34567)
-print(book1.title)
-Tome_Rater.print_catalog()
-print(book3.isbn)
 book2 = Tome_Rater.create_book("le meilleur du jeu", 32673838456)
 bookbook = Tome_Rater.create_book("bookbook", 345566)
 bookbookbof = Tome_Rater.create_book("bookbookbof", 348756)
 print(book1)
 Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book1])
-Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book2])
-Tome_Rater.add_book_to_user(book2, "thomas.grevedon@gmail.com")
-Tome_Rater.add_user("Thoma", "thomas.greveon@gmail.com", [book3])
-Tome_Rater.add_user("Tho", "thomas.@gmail.com", [book1])
-Tome_Rater.add_user("Tho", "thomas.@gmail.nimp", [book1])
+Tome_Rater.add_user("Thoma", "thomas.greveon@gmail.com", [book1])
+Tome_Rater.add_user("Tho", "thomas.@gmail.com", [book2])
 print(Tome_Rater.books)
 Tome_Rater.print_catalog()
 Tome_Rater.print_users()
@@ -257,17 +192,9 @@ Tome_Rater.add_book_to_user(bookbookbof, "thomas.grevedon@gmail.com", 2)
 Tome_Rater.add_book_to_user(bookbookbof, "thomas.@gmail.com", 2)
 print(Tome_Rater.highest_rated_book())
 print(Tome_Rater.most_positive_user())
-for ref in Book.instances:
-    book = ref()
-    isbn_list = []
-    isbn_list.append(book.isbn)
-print(3456 in isbn_list)
-
+"""
 
 """
 ideas
-Ask the user to decide what he wants to do and get the most efficient books on a certain topic"
-Put some introduction sentence before outputs
-sorted elements?
 add commments of book in string in string
 """
