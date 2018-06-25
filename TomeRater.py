@@ -332,6 +332,7 @@ sorted elements?
 add commments of book in string in string
 
 add a message about number of users for the most prolific Users
+
 do the 2 last functions about price of books
 try to create a chatboat and see if I add extra stuff like comment (? not so sure) tu prends un bouquin et tu cherche dans chaque user. comments si le bouquin est là est tu affiche le comment
 OU autre idee c'est de chercher les utilisateur qui ont donné un certain rating au bouquin et d'afficher les commentaires. dans user creer dico avec livre qui renvoie à une liste de valeur [ratin, comment]
