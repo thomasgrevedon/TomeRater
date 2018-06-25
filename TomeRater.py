@@ -74,7 +74,8 @@ class Book(object):
             print("invalid Rating")
 
     def __eq__(self, other_book):
-        return (other_book.title == self.title and other_book.isbn == self.isbn)
+        if other_book.title == self.title:
+            return other_book.isbn == self.isbn
 
     def get_average_rating(self):
         total = 0
@@ -147,14 +148,18 @@ class TomeRater(object):
     def add_book_to_user(self, book, email, rating = "None"):
         try:
             self.users[email]
-            self.users[email].read_book(book, rating)
-            if rating != "None":
-                book.add_rating(rating)
             try:
-                self.books[book]
-                self.books[book] += 1
-            except KeyError:
-                self.books[book] = 1
+                book.isbn
+                self.users[email].read_book(book, rating)
+                if rating != "None":
+                    book.add_rating(rating)
+                try:
+                    self.books[book]
+                    self.books[book] += 1
+                except KeyError:
+                    self.books[book] = 1
+            except AttributeError:
+                print("sorry the following book \"{book}\" could not be added to the user as it needs to be created first.".format(book = book))
         except KeyError:
             print("No user with email {email}".format(email = email))
 
@@ -171,7 +176,7 @@ class TomeRater(object):
                     self.users[email] = User(name, email) #adds the email as Key in dictionnary of the class and add the User class as value
                     if user_books != "None":
                         for i in user_books:
-                            self.add_book_to_user(i, email)
+                                self.add_book_to_user(i, email)
                     needMessage = False
                     break
                 else:
@@ -224,6 +229,49 @@ class TomeRater(object):
                 highest_positive_user = i
         return highest_positive_user
 
+    def get_n_most_read_books(self, n = 0):
+        total = 0
+        new_dict = self.books
+        ordered_lst = []
+        sensor = 1
+        if n <= len(new_dict) and n >= sensor:
+            while sensor <= n:
+                for i in new_dict:
+                    if new_dict[i] > total:
+                        value = i.title
+                        valueToRemove = i
+                        total = self.books[i]
+                        print(i)
+                ordered_lst.append(value)
+                new_dict.pop(valueToRemove)
+                total = 0
+                sensor += 1
+            return ordered_lst
+        else:
+            return "Please choose a number between 1 and {number} both included".format(number = len(new_dict))
+
+    def get_n_most_prolific_user(self, n = 0):
+        total = 0
+        temp_dic = self.users
+        mostProlificUsers = []
+        if n <= len(temp_dic):
+            while len(temp_dic) != 0:
+                for user in temp_dic:
+                    if len(temp_dic[user].books) > total:
+                        value = temp_dic[user]
+                        valueToRemove = user
+                        total = len(temp_dic[user].books)
+                mostProlificUsers.append(value)
+                temp_dic.pop(valueToRemove)
+                total = 0
+            return mostProlificUsers[0: n]
+        else:
+            return 'Your request exceed the number of users in the databse. Please choose a number between 1 and {number} both included'.format(number = len(temp_dic))
+        #message for number of users lije the number of books red
+
+    def __repr__(self):
+        return "The most read book is \'{book_most_red}\' and the highest rated book is \'{book_highest_rated}\'. The most psitive reader is \'{user}\'"\
+        .format(book_most_red = self.get_most_read_book(), book_highest_rated = self.highest_rated_book(), user = self.most_positive_user())
 
 Tome_Rater = TomeRater()
 Tome_Rater.print_catalog()
@@ -234,14 +282,19 @@ book5 = Tome_Rater.create_book("le meilleur des sites", 345671)
 book6 = Tome_Rater.create_novel("le meilleur des novel", "Bernard De la Villardiere", 3456)
 book7 = Tome_Rater.create_non_fiction("le meilleur des website", "Python", "Beginner", 3456)
 book8 = Tome_Rater.create_novel("le meilleur des website", "Python", 34567)
+book9 = Tome_Rater.create_novel("je fais juste un trst pour voir", "Python", 345674444)
 print(book1.title)
 Tome_Rater.print_catalog()
 print(book3.isbn)
 book2 = Tome_Rater.create_book("le meilleur du jeu", 32673838456)
 bookbook = Tome_Rater.create_book("bookbook", 345566)
 bookbookbof = Tome_Rater.create_book("bookbookbof", 348756)
+bookbookbof1 = Tome_Rater.create_book("bookbookbof1", 3487569)
+bookbookbof2 = Tome_Rater.create_book("bookbookbof2", 3487568)
+bookbookbof3 = Tome_Rater.create_book("bookbookbof3", 3487567)
+bookbookbof4 = Tome_Rater.create_book("bookbookbof4", 3487565)
 print(book1)
-Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book1])
+Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book1, "je fais juste un trst pour voir"])
 Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book2])
 Tome_Rater.add_book_to_user(book2, "thomas.grevedon@gmail.com")
 Tome_Rater.add_user("Thoma", "thomas.greveon@gmail.com", [book3])
@@ -255,6 +308,11 @@ Tome_Rater.add_book_to_user(bookbook, "thomas.grevedon@gmail.com", 4)
 Tome_Rater.add_book_to_user(bookbook, "thomas.greveon@gmail.com", 2)
 Tome_Rater.add_book_to_user(bookbookbof, "thomas.grevedon@gmail.com", 2)
 Tome_Rater.add_book_to_user(bookbookbof, "thomas.@gmail.com", 2)
+Tome_Rater.add_book_to_user(bookbookbof1, "thomas.@gmail.com", 2)
+Tome_Rater.add_book_to_user(bookbookbof2, "thomas.@gmail.com", 2)
+Tome_Rater.add_book_to_user(bookbookbof3, "thomas.@gmail.com", 2)
+Tome_Rater.add_book_to_user(bookbookbof4, "thomas.@gmail.com", 2)
+Tome_Rater.add_book_to_user("je fais un autre test", "thomas.@gmail.com", 2)
 print(Tome_Rater.highest_rated_book())
 print(Tome_Rater.most_positive_user())
 for ref in Book.instances:
@@ -262,7 +320,9 @@ for ref in Book.instances:
     isbn_list = []
     isbn_list.append(book.isbn)
 print(3456 in isbn_list)
-
+print(Tome_Rater)
+print(Tome_Rater.get_n_most_read_books(0))
+print(Tome_Rater.get_n_most_prolific_user(1))
 
 """
 ideas
@@ -270,4 +330,12 @@ Ask the user to decide what he wants to do and get the most efficient books on a
 Put some introduction sentence before outputs
 sorted elements?
 add commments of book in string in string
+
+add a message about number of users for the most prolific Users
+do the 2 last functions about price of books
+try to create a chatboat and see if I add extra stuff like comment (? not so sure) tu prends un bouquin et tu cherche dans chaque user. comments si le bouquin est là est tu affiche le comment
+OU autre idee c'est de chercher les utilisateur qui ont donné un certain rating au bouquin et d'afficher les commentaires. dans user creer dico avec livre qui renvoie à une liste de valeur [ratin, comment]
+Put some introduction sentence before outputs
+add comments and clean
+upload
 """
