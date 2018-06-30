@@ -41,11 +41,12 @@ class User(object):
 class Book(object):
     instances = set()
 
-    def __init__(self, title, isbn):
+    def __init__(self, title, isbn, price = 0):
         self.title = title #this will be a string
         self.isbn = isbn #this will be a number
         self.instances.add(weakref.ref(self))
         self.rating = []
+        self.price = price
 
     def isIsbnExist(self, isbn):
         if len(Book.instances) > 0:
@@ -91,8 +92,8 @@ class Book(object):
 
 
 class Fiction(Book):
-    def __init__(self, title, author, isbn):
-        super().__init__(title, isbn)
+    def __init__(self, title, author, isbn, price = 0):
+        super().__init__(title, isbn, price)
         self.author = author
 
     def get_author(self):
@@ -102,8 +103,8 @@ class Fiction(Book):
         return "{title} by {author}".format(title = self.title, author = self.author)
 
 class Non_Fiction(Book):
-    def __init__(self, title, subject, level, isbn):
-        super().__init__(title, isbn)
+    def __init__(self, title, subject, level, isbn, price = 0):
+        super().__init__(title, isbn, price)
         self.subject = subject #this will be a string
         self.level = level #this will be a string
 
@@ -124,24 +125,24 @@ class TomeRater(object):
         self.users = {} #this will map a user's email to the cooresponding User obeject
         self.books = {} #this will map a Book object to the number of Users that have read it
 
-    def create_book(self, title, isbn):
+    def create_book(self, title, isbn, price = 0):
         if Book.isIsbnExist(self, isbn) == False:
-            return Book(title, isbn)
+            return Book(title, isbn, price)
         else:
             print(TomeRater.MessageIsbnAlreadyExists)
 
-    def create_novel(self, title, author, isbn):
+    def create_novel(self, title, author, isbn, price = 0):
         print("ATTENTION ATTENTION")
         if Book.isIsbnExist(self, isbn) == False:
             print("ah ah je t'a eu")
             print(Book.isIsbnExist(self, isbn))
-            return Fiction(title, author, isbn)
+            return Fiction(title, author, isbn, price)
         else:
             print(TomeRater.MessageIsbnAlreadyExists)
 
-    def create_non_fiction(self, title, subject, level, isbn):
+    def create_non_fiction(self, title, subject, level, isbn, price = 0):
         if Book.isIsbnExist(self, isbn) == False:
-            return Non_Fiction(title, subject, level, isbn)
+            return Non_Fiction(title, subject, level, isbn, price)
         else:
             print(TomeRater.MessageIsbnAlreadyExists)
 
@@ -231,7 +232,7 @@ class TomeRater(object):
 
     def get_n_most_read_books(self, n = 0):
         total = 0
-        new_dict = self.books
+        new_dict = dict(self.books)
         ordered_lst = []
         sensor = 1
         if n <= len(new_dict) and n >= sensor:
@@ -252,9 +253,9 @@ class TomeRater(object):
 
     def get_n_most_prolific_user(self, n = 0):
         total = 0
-        temp_dic = self.users
+        temp_dic = dict(self.users)
         mostProlificUsers = []
-        if n <= len(temp_dic):
+        if n <= len(temp_dic) and len(temp_dic) > 0:
             while len(temp_dic) != 0:
                 for user in temp_dic:
                     if len(temp_dic[user].books) > total:
@@ -265,9 +266,69 @@ class TomeRater(object):
                 temp_dic.pop(valueToRemove)
                 total = 0
             return mostProlificUsers[0: n]
+        elif len(temp_dic) == 0:
+            return "Your request cannot be processed since no users have been created. Pease create users before calling this request."
         else:
             return 'Your request exceed the number of users in the databse. Please choose a number between 1 and {number} both included'.format(number = len(temp_dic))
         #message for number of users lije the number of books red
+
+    def get_n_most_expensive_books(self, n=4):
+        total = -1
+        temp_dic = {}
+        price_lst = []
+        book_name = []
+        if len(Book.instances) > 0:
+            for book in Book.instances:
+                book = book()
+                temp_dic[book.title] = book.price
+            print(temp_dic)
+            while len(temp_dic) != 0:
+                for book in temp_dic:
+                    #print(temp_dic)
+                    if temp_dic[book] > total:
+                        title_to_add = book
+                        valueToRemove= book
+                        price_to_add = temp_dic[book]
+                        total = temp_dic[book]
+            #            print(total)
+                book_name.append(title_to_add)
+                price_lst.append(price_to_add)
+                temp_dic.pop(valueToRemove)
+                total = -1
+            nameAndPriceLst = list(zip(book_name, price_lst))
+            print(nameAndPriceLst)
+            if n <= len(nameAndPriceLst):
+                for tuple in range(0, n):
+                    sensor = 0
+                    book = ""
+                    price = 0
+                    for item in nameAndPriceLst[tuple]:
+                        if sensor == 0:
+                            book = item
+                            sensor = 1
+                        else:
+                            price = item
+                            sensor = 0
+                    print("The book's name is \"{book}\" coming with the following price ${price}".format(book = book, price = price))
+                return "End of list"
+            else:
+                return "Please choose a number between 1 and {n} boh included".format(n = len(nameAndPriceLst))
+        else:
+            return "The book catalog is empty, please create some books first"
+
+    def get_worth_of_user(self, user_email):
+        try:
+            self.users[user_email]
+            total = 0
+            for i in self.users[user_email].books:
+                for book in Book.instances:
+                    book = book()
+                    if book.title == i.title:
+                        value = book.price
+                        total += value
+            return "The sum of all costs of books read by {user} is ${value}".format(user = self.users[user_email].name, value = total)
+        except KeyError:
+            return "Sorry there is no user with this email address or no email address has been provided. Please check the provided email address"
 
     def __repr__(self):
         return "The most read book is \'{book_most_red}\' and the highest rated book is \'{book_highest_rated}\'. The most psitive reader is \'{user}\'"\
@@ -275,24 +336,26 @@ class TomeRater(object):
 
 Tome_Rater = TomeRater()
 Tome_Rater.print_catalog()
-book1 = Tome_Rater.create_book("le meilleur des mondes", 3456)
-book3 = Tome_Rater.create_book("le meilleur des sites", 34567)
-book4 = Tome_Rater.create_book("le meilleur des test", 34567)
-book5 = Tome_Rater.create_book("le meilleur des sites", 345671)
-book6 = Tome_Rater.create_novel("le meilleur des novel", "Bernard De la Villardiere", 3456)
-book7 = Tome_Rater.create_non_fiction("le meilleur des website", "Python", "Beginner", 3456)
-book8 = Tome_Rater.create_novel("le meilleur des website", "Python", 34567)
-book9 = Tome_Rater.create_novel("je fais juste un trst pour voir", "Python", 345674444)
+print(Tome_Rater.get_n_most_prolific_user(3))
+print(Tome_Rater.get_n_most_expensive_books(5))
+book1 = Tome_Rater.create_book("le meilleur des mondes", 3456, 20)
+book3 = Tome_Rater.create_book("le meilleur des sites", 34567, 15)
+book4 = Tome_Rater.create_book("le meilleur des test", 34567, 13)
+book5 = Tome_Rater.create_book("le meilleur des sites", 345671, 10)
+book6 = Tome_Rater.create_novel("le meilleur des novel", "Bernard De la Villardiere", 3456, 30)
+book7 = Tome_Rater.create_non_fiction("le meilleur des website", "Python", "Beginner", 3456, 40)
+book8 = Tome_Rater.create_novel("le meilleur des website", "Python", 34567, 12)
+book9 = Tome_Rater.create_novel("je fais juste un trst pour voir", "Python", 345674444, 8)
 print(book1.title)
 Tome_Rater.print_catalog()
 print(book3.isbn)
-book2 = Tome_Rater.create_book("le meilleur du jeu", 32673838456)
-bookbook = Tome_Rater.create_book("bookbook", 345566)
-bookbookbof = Tome_Rater.create_book("bookbookbof", 348756)
+book2 = Tome_Rater.create_book("le meilleur du jeu", 32673838456, 45)
+bookbook = Tome_Rater.create_book("bookbook", 345566, 13)
+bookbookbof = Tome_Rater.create_book("bookbookbof", 348756, 16)
 bookbookbof1 = Tome_Rater.create_book("bookbookbof1", 3487569)
-bookbookbof2 = Tome_Rater.create_book("bookbookbof2", 3487568)
-bookbookbof3 = Tome_Rater.create_book("bookbookbof3", 3487567)
-bookbookbof4 = Tome_Rater.create_book("bookbookbof4", 3487565)
+bookbookbof2 = Tome_Rater.create_book("bookbookbof2", 3487568, 21)
+bookbookbof3 = Tome_Rater.create_book("bookbookbof3", 3487567, 12)
+bookbookbof4 = Tome_Rater.create_book("bookbookbof4", 3487565, 7)
 print(book1)
 Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book1, "je fais juste un trst pour voir"])
 Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book2])
@@ -321,8 +384,22 @@ for ref in Book.instances:
     isbn_list.append(book.isbn)
 print(3456 in isbn_list)
 print(Tome_Rater)
-print(Tome_Rater.get_n_most_read_books(0))
-print(Tome_Rater.get_n_most_prolific_user(1))
+print(Tome_Rater.get_n_most_read_books(4))
+print(Tome_Rater.get_n_most_read_books(4))
+print(Tome_Rater.get_n_most_read_books(4))
+print(Tome_Rater.get_n_most_read_books(4))
+print(Tome_Rater.get_n_most_prolific_user(15))
+print("-----------------------------------------------------------------------------------")
+Tome_Rater.print_users()
+print(Tome_Rater.get_n_most_prolific_user(3))
+print(Tome_Rater.get_n_most_prolific_user(3))
+Tome_Rater.print_users()
+print(Tome_Rater.get_n_most_expensive_books(5))
+Tome_Rater.get_n_most_expensive_books(5)
+
+print(Tome_Rater.get_worth_of_user("thomas.@gmail.com"))
+
+
 
 """
 ideas
