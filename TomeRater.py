@@ -49,6 +49,7 @@ class Book(object):
         self.price = price
 
     def isIsbnExist(self, isbn):
+        print(isbn)
         if len(Book.instances) > 0:
             isbn_list = []
             for book in Book.instances:
@@ -72,7 +73,7 @@ class Book(object):
         if rating >= 0 and rating <= 4:
             self.rating.append(rating)
         else:
-            print("invalid Rating")
+            print("invalid Rating. Please enter a rating between 0 and 4 both included")
 
     def __eq__(self, other_book):
         if other_book.title == self.title:
@@ -120,6 +121,7 @@ class Non_Fiction(Book):
 class TomeRater(object):
     MessageIsbnAlreadyExists = "Sorry, this ISBN already exists, please choose another ISBN for this book"
     MessageUserAlreadyExists = "This user already exists. Please, choose add_book_to_user function in order to add book to this reader! Thanks mate"
+    bookCreationDictionnary = {}
 
     def __init__(self):
         self.users = {} #this will map a user's email to the cooresponding User obeject
@@ -127,6 +129,10 @@ class TomeRater(object):
 
     def create_book(self, title, isbn, price = 0):
         if Book.isIsbnExist(self, isbn) == False:
+            print("I am hereeeeeeeeeeeeeeeeeeeeeeeeeee")
+            print(title)
+            print(isbn)
+            print(price)
             return Book(title, isbn, price)
         else:
             print(TomeRater.MessageIsbnAlreadyExists)
@@ -331,14 +337,220 @@ class TomeRater(object):
             return "Sorry there is no user with this email address or no email address has been provided. Please check the provided email address"
 
     def __repr__(self):
-        return "The most read book is \'{book_most_red}\' and the highest rated book is \'{book_highest_rated}\'. The most psitive reader is \'{user}\'"\
+        return "The most read book is \'{book_most_red}\' and the highest rated book is \'{book_highest_rated}\'. The most positive reader is \'{user}\'"\
         .format(book_most_red = self.get_most_read_book(), book_highest_rated = self.highest_rated_book(), user = self.most_positive_user())
+
+    def MainMenu(self):
+        print("Welcome to Tomerater. What would you like to do? Please select one of the following \
+         \n [1] Print catalog \n [2] Print users \n [3] Create a book \n [4] Add user \n [5] Add book to user \n [6] Get most read book \
+          \n [7] Get highest rated book \n [8] Get most positive user \n [9] Get n most read book \n [10] Get n most prolific users\
+          \n [11] Get n most expensive books \n [12] Get worth of user \n [13] Print TomeRater \n [14] Exit")
+        n = input()
+        print(n)
+        if n == "1":
+            print("Please find below the catalog but note that only books that have been already read one time are there")
+    #        book = self.bookCreationDictionnary["thomasplaya"]
+    #        self.add_user("jean-pierre pernau", "JP@hothot.com", [book])
+            self.print_catalog()
+            print("")
+            self.MainMenu()
+        elif n == "2":
+            self.print_users()
+            print("")
+            self.MainMenu()
+        elif n == "3":
+            self.MenuCreateBook()
+        elif n == "4":
+            self.MenuAddUser()
+        elif n == "5":
+            self.MenuAddBookToUser()
+        elif n == "6":
+            print(self.get_most_read_book())
+            print("")
+            self.MainMenu()
+        elif n == "7":
+            print(self.highest_rated_book())
+            print("")
+            self.MainMenu()
+        elif n == "8":
+            print(self.most_positive_user())
+            print("")
+            self.MainMenu()
+        elif n == "9":
+            self.MenuGetMostObjects(9)
+        elif n == "10":
+            self.MenuGetMostObjects(10)
+        elif n == "11":
+            self.MenuGetMostObjects(11)
+        elif n == "12":
+            self.MenuGetWorthOfUser()
+        elif n == "13":
+            print(self)
+            print("")
+            self.MainMenu()
+        elif n == "14":
+            print("End")
+        else:
+            print("Sorry, you selection is not valid, choose between the number given in the options")
+            print("")
+            self.MainMenu()
+
+
+    def MenuCreateBook(self):
+        print("Please, write the title of the book")
+        title = str(input())
+        print("Please give the ISBN of the book")
+        isbn = input()
+        sensor = 0
+        while sensor == 0:
+            try:
+             int(isbn)
+             sensor = 1
+            except ValueError:
+                print("Sorry your input is not valid. Pease insert a number")
+                print("Please give the ISBN of the book")
+                isbn = input()
+        print("Please give the price of the book")
+        price = input()
+        sensor = 0
+        while sensor == 0:
+            try:
+             int(price)
+             sensor = 1
+            except ValueError:
+                print("Sorry your input is not valid. Pease insert a number")
+                print("Please give the price of the book")
+                price = input()
+        print('what reference name would you like to use for the book? Please answer without space')
+        name = input().replace(" ", "")
+        print(self.bookCreationDictionnary)
+        booktocreate = self.create_book(title, int(isbn), int(price))
+        try:
+            booktocreate.isbn
+            self.bookCreationDictionnary[name] = booktocreate
+            self.MainMenu()
+        except AttributeError:
+            print("Sorry the book could not have been created")
+            self.MainMenu()
+
+    def MenuAddUser(self):
+        print("What is the name of the user?")
+        name = input()
+        print("Please give the email addres of the user")
+        email = input()
+        print("Would you like to add book to this user? \n [1] Yes \n [2] No")
+        n = input()
+        booklst = []
+        bookToAdd = []
+        if n == "1":
+            sensor = 0
+            while sensor == 0:
+                for book in self.bookCreationDictionnary.keys():
+                    booklst.append(book)
+                print("Please choose one of the following book to add to the user (without strings)")
+                print(booklst)
+                book = input()
+                if book in booklst:
+                    bookToAdd.append(self.bookCreationDictionnary[book])
+                    sensor = 1
+                else:
+                    print("Sorry your selection is not valid. Please choose a book among the list")
+                    booklst = []
+        if len(bookToAdd) > 0:
+            self.add_user(name, email, bookToAdd)
+        else:
+            self.add_user(name, email)
+        self.MainMenu()
+
+    def MenuAddBookToUser(self):
+        sensor = 0
+        booklst = []
+        while sensor == 0:
+            for book in self.bookCreationDictionnary.keys():
+                booklst.append(book)
+            print("Please choose amoong the list, the book you would like to add (without string)")
+            print(booklst)
+            book = input()
+            if book in booklst:
+                bookToAdd = self.bookCreationDictionnary[book]
+                sensor = 1
+            else:
+                print("sorry your entry is not correct. Please choose a book among the list")
+                booklst = []
+        sensor = 0
+        userlst = []
+        while sensor == 0:
+            for user in self.users.keys():
+                userlst.append(user)
+            print("Please choose among the following email address the one you would like to choose (without string)")
+            print(userlst)
+            user = input()
+            if user in userlst:
+                userToSelect = user
+                sensor = 1
+            else:
+                print("Sorry your entry is not valid. please check the email address in the list")
+                userlst = []
+        print("do you want to add a rating? \n [1] Yes \n [2] No")
+        n = input()
+        sensor = 0
+        if n == "1":
+            print("Please give the rating of the book between 0 and 4 both included")
+            rating = input()
+            while sensor == 0:
+                try:
+                    int(rating)
+                    ratingToAdd = int(rating)
+                    if ratingToAdd < 0 or ratingToAdd > 4:
+                        print("Sorry insert a number between 0 and 4 both included")
+                        rating = input()
+                    else:
+                        sensor = 1
+                except ValueError:
+                    print("Sorry your input is not valid. Pease insert a number")
+                    print("Please give the rating of the book")
+                    rating = input()
+        else:
+            ratingToAdd = "None"
+        self.add_book_to_user(bookToAdd, userToSelect, ratingToAdd)
+        self.MainMenu()
+
+    def MenuGetMostObjects(self, x):
+        print("How many books would you like to have on your list? Please insert a number")
+        n = input()
+        sensor = 0
+        while sensor == 0:
+            try:
+                int(n)
+                if x == 9:
+                    print(self.get_n_most_read_books(int(n)))
+                elif x == 10:
+                    print(self.get_n_most_prolific_user(int(n)))
+                else:
+                    print(self.get_n_most_expensive_books(int(n)))
+                sensor = 1
+            except ValueError:
+                print("sorry your entry is not valid. Please insert a number")
+                n = input()
+        self.MainMenu()
+
+    def MenuGetWorthOfUser(self):
+        userlst = []
+        for user in self.users.keys():
+            userlst.append(user)
+        print("Please choose among the following email address the one you would like to know the value (without string)")
+        print(userlst)
+        user = input()
+        print(self.get_worth_of_user(user))
+        self.MainMenu()
+
+
 
 Tome_Rater = TomeRater()
 Tome_Rater.print_catalog()
 print(Tome_Rater.get_n_most_prolific_user(3))
 print(Tome_Rater.get_n_most_expensive_books(5))
-book1 = Tome_Rater.create_book("le meilleur des mondes", 3456, 20)
+Tome_Rater.bookCreationDictionnary["book1"] = Tome_Rater.create_book("le meilleur des mondes", 3456, 20)
 book3 = Tome_Rater.create_book("le meilleur des sites", 34567, 15)
 book4 = Tome_Rater.create_book("le meilleur des test", 34567, 13)
 book5 = Tome_Rater.create_book("le meilleur des sites", 345671, 10)
@@ -346,7 +558,7 @@ book6 = Tome_Rater.create_novel("le meilleur des novel", "Bernard De la Villardi
 book7 = Tome_Rater.create_non_fiction("le meilleur des website", "Python", "Beginner", 3456, 40)
 book8 = Tome_Rater.create_novel("le meilleur des website", "Python", 34567, 12)
 book9 = Tome_Rater.create_novel("je fais juste un trst pour voir", "Python", 345674444, 8)
-print(book1.title)
+#print(book1.title)
 Tome_Rater.print_catalog()
 print(book3.isbn)
 book2 = Tome_Rater.create_book("le meilleur du jeu", 32673838456, 45)
@@ -356,13 +568,16 @@ bookbookbof1 = Tome_Rater.create_book("bookbookbof1", 3487569)
 bookbookbof2 = Tome_Rater.create_book("bookbookbof2", 3487568, 21)
 bookbookbof3 = Tome_Rater.create_book("bookbookbof3", 3487567, 12)
 bookbookbof4 = Tome_Rater.create_book("bookbookbof4", 3487565, 7)
-print(book1)
-Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book1, "je fais juste un trst pour voir"])
+print("**************************************************************************")
+print(book3)
+print(Tome_Rater.bookCreationDictionnary["book1"])
+Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [Tome_Rater.bookCreationDictionnary["book1"], "je fais juste un trst pour voir"])
+bookbookbof5 = Tome_Rater.create_book("bookbookbof5", 345873887565, 8)
 Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book2])
 Tome_Rater.add_book_to_user(book2, "thomas.grevedon@gmail.com")
 Tome_Rater.add_user("Thoma", "thomas.greveon@gmail.com", [book3])
-Tome_Rater.add_user("Tho", "thomas.@gmail.com", [book1])
-Tome_Rater.add_user("Tho", "thomas.@gmail.nimp", [book1])
+Tome_Rater.add_user("Tho", "thomas.@gmail.com", [Tome_Rater.bookCreationDictionnary["book1"]])
+Tome_Rater.add_user("Tho", "thomas.@gmail.nimp", [Tome_Rater.bookCreationDictionnary["book1"]])
 print(Tome_Rater.books)
 Tome_Rater.print_catalog()
 Tome_Rater.print_users()
@@ -399,7 +614,9 @@ Tome_Rater.get_n_most_expensive_books(5)
 
 print(Tome_Rater.get_worth_of_user("thomas.@gmail.com"))
 
+print(Tome_Rater.bookCreationDictionnary)
 
+Tome_Rater.MainMenu()
 
 """
 ideas
