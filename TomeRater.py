@@ -547,74 +547,82 @@ class TomeRater(object):
 
 
 Tome_Rater = TomeRater()
+#cerate some books:
+Tome_Rater.bookCreationDictionnary["book1"] = Tome_Rater.create_book("Society of Mind", 12345678, 20)
+Tome_Rater.bookCreationDictionnary["novel1"] = Tome_Rater.create_novel("Alice In Wonderland", "Lewis Carroll", 12345, 15)
+Tome_Rater.bookCreationDictionnary["notification1"] = Tome_Rater.create_non_fiction("Automate the Boring Stuff", "Python", "beginner", 1929452, 23)
+Tome_Rater.bookCreationDictionnary["notification2"] = Tome_Rater.create_non_fiction("Computing Machinery and Intelligence", "AI", "advanced", 11111938, 44)
+Tome_Rater.bookCreationDictionnary["novel2"] = Tome_Rater.create_novel("The Diamond Age", "Neal Stephenson", 10101010, 12)
+Tome_Rater.bookCreationDictionnary["novel3"] = Tome_Rater.create_novel("There Will Come Soft Rains", "Ray Bradbury", 10001000, 7)
+
+#create users:
+Tome_Rater.add_user("Alan Turing", "alan@turing.com")
+Tome_Rater.add_user("David Marr", "david@computation.org")
+
+#add a user with three books already read:
+Tome_Rater.add_user("Marvin Minsky", "marvin@mit.edu", user_books=[Tome_Rater.bookCreationDictionnary["book1"], Tome_Rater.bookCreationDictionnary["novel1"], Tome_Rater.bookCreationDictionnary["notification1"]])
+
+#add books to a user one by one, with ratings:
+Tome_Rater.add_book_to_user(Tome_Rater.bookCreationDictionnary["book1"], "alan@turing.com", 1)
+Tome_Rater.add_book_to_user(Tome_Rater.bookCreationDictionnary["novel1"], "alan@turing.com", 3)
+Tome_Rater.add_book_to_user(Tome_Rater.bookCreationDictionnary["notification1"], "alan@turing.com", 3)
+Tome_Rater.add_book_to_user(Tome_Rater.bookCreationDictionnary["notification2"], "alan@turing.com", 4)
+Tome_Rater.add_book_to_user(Tome_Rater.bookCreationDictionnary["novel3"], "alan@turing.com", 1)
+Tome_Rater.add_book_to_user(Tome_Rater.bookCreationDictionnary["novel2"], "marvin@mit.edu", 2)
+Tome_Rater.add_book_to_user(Tome_Rater.bookCreationDictionnary["novel3"], "marvin@mit.edu", 2)
+Tome_Rater.add_book_to_user(Tome_Rater.bookCreationDictionnary["novel3"], "david@computation.org", 4)
+
+print("Here is the catalog of TomeRater:")
 Tome_Rater.print_catalog()
-print(Tome_Rater.get_n_most_prolific_user(3))
-print(Tome_Rater.get_n_most_expensive_books(5))
-Tome_Rater.bookCreationDictionnary["book1"] = Tome_Rater.create_book("le meilleur des mondes", 3456, 20)
-book3 = Tome_Rater.create_book("le meilleur des sites", 34567, 15)
-book4 = Tome_Rater.create_book("le meilleur des test", 34567, 13)
-book5 = Tome_Rater.create_book("le meilleur des sites", 345671, 10)
-book6 = Tome_Rater.create_novel("le meilleur des novel", "Bernard De la Villardiere", 3456, 30)
-book7 = Tome_Rater.create_non_fiction("le meilleur des website", "Python", "Beginner", 3456, 40)
-book8 = Tome_Rater.create_novel("le meilleur des website", "Python", 34567, 12)
-book9 = Tome_Rater.create_novel("je fais juste un trst pour voir", "Python", 345674444, 8)
-#print(book1.title)
-Tome_Rater.print_catalog()
-print(book3.isbn)
-book2 = Tome_Rater.create_book("le meilleur du jeu", 32673838456, 45)
-bookbook = Tome_Rater.create_book("bookbook", 345566, 13)
-bookbookbof = Tome_Rater.create_book("bookbookbof", 348756, 16)
-bookbookbof1 = Tome_Rater.create_book("bookbookbof1", 3487569)
-bookbookbof2 = Tome_Rater.create_book("bookbookbof2", 3487568, 21)
-bookbookbof3 = Tome_Rater.create_book("bookbookbof3", 3487567, 12)
-bookbookbof4 = Tome_Rater.create_book("bookbookbof4", 3487565, 7)
-print("**************************************************************************")
-print(book3)
-print(Tome_Rater.bookCreationDictionnary["book1"])
-Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [Tome_Rater.bookCreationDictionnary["book1"], "je fais juste un trst pour voir"])
-bookbookbof5 = Tome_Rater.create_book("bookbookbof5", 345873887565, 8)
-Tome_Rater.add_user("Thomas", "thomas.grevedon@gmail.com", user_books = [book2])
-Tome_Rater.add_book_to_user(book2, "thomas.grevedon@gmail.com")
-Tome_Rater.add_user("Thoma", "thomas.greveon@gmail.com", [book3])
-Tome_Rater.add_user("Tho", "thomas.@gmail.com", [Tome_Rater.bookCreationDictionnary["book1"]])
-Tome_Rater.add_user("Tho", "thomas.@gmail.nimp", [Tome_Rater.bookCreationDictionnary["book1"]])
-print(Tome_Rater.books)
-Tome_Rater.print_catalog()
+print("")
+
+print("Here is the list of users:")
 Tome_Rater.print_users()
+print("")
+
+print("Here is what happens when we want to create a book with an existing ISBN. The try is to create a book2 called \"\" Sneaky ISBN \"\" with the existing ISBN: 12345678")
+Tome_Rater.bookCreationDictionnary["book2"] = Tome_Rater.create_book("Sneaky ISBN", 12345678, 28)
+print("")
+
+print("Here is what happens when we try to create a user with an invalid email address. The try is to create a user with the emal address: user@doesnotwork.fail:")
+Tome_Rater.add_user("User", "user@doesnotwork.self.fail")
+print("")
+
+print("Here is what happens when we want to add a user that alrady exists:")
+Tome_Rater.add_user("Alan Turing", "alan@turing.com")
+print("")
+
+print("Here is the most read book:")
 print(Tome_Rater.get_most_read_book())
-Tome_Rater.add_book_to_user(bookbook, "thomas.grevedon@gmail.com", 4)
-Tome_Rater.add_book_to_user(bookbook, "thomas.greveon@gmail.com", 2)
-Tome_Rater.add_book_to_user(bookbookbof, "thomas.grevedon@gmail.com", 2)
-Tome_Rater.add_book_to_user(bookbookbof, "thomas.@gmail.com", 2)
-Tome_Rater.add_book_to_user(bookbookbof1, "thomas.@gmail.com", 2)
-Tome_Rater.add_book_to_user(bookbookbof2, "thomas.@gmail.com", 2)
-Tome_Rater.add_book_to_user(bookbookbof3, "thomas.@gmail.com", 2)
-Tome_Rater.add_book_to_user(bookbookbof4, "thomas.@gmail.com", 2)
-Tome_Rater.add_book_to_user("je fais un autre test", "thomas.@gmail.com", 2)
+print("")
+
+print("Here is the highest_rated_book:")
 print(Tome_Rater.highest_rated_book())
+print("")
+
+print("Here is the most positive user:")
 print(Tome_Rater.most_positive_user())
-for ref in Book.instances:
-    book = ref()
-    isbn_list = []
-    isbn_list.append(book.isbn)
-print(3456 in isbn_list)
+print("")
+
+print("Here are the 3 most read books:")
+print(Tome_Rater.get_n_most_read_books(3))
+print("")
+
+print("Here are the 2 most prolific users:")
+print(Tome_Rater.get_n_most_prolific_user(2))
+print("")
+
+print("Here are the 4 most expensive books:")
+print(Tome_Rater.get_n_most_expensive_books(4))
+print("")
+
+print("Here is the worth value of the user: Alan Turing with email address: alan@turing.com:")
+print(Tome_Rater.get_worth_of_user("alan@turing.com"))
+print("")
+
+print("Here how TomeRater looks like when it is printed:")
 print(Tome_Rater)
-print(Tome_Rater.get_n_most_read_books(4))
-print(Tome_Rater.get_n_most_read_books(4))
-print(Tome_Rater.get_n_most_read_books(4))
-print(Tome_Rater.get_n_most_read_books(4))
-print(Tome_Rater.get_n_most_prolific_user(15))
-print("-----------------------------------------------------------------------------------")
-Tome_Rater.print_users()
-print(Tome_Rater.get_n_most_prolific_user(3))
-print(Tome_Rater.get_n_most_prolific_user(3))
-Tome_Rater.print_users()
-print(Tome_Rater.get_n_most_expensive_books(5))
-Tome_Rater.get_n_most_expensive_books(5)
-
-print(Tome_Rater.get_worth_of_user("thomas.@gmail.com"))
-
-print(Tome_Rater.bookCreationDictionnary)
+print("")
 
 Tome_Rater.MainMenu()
 
